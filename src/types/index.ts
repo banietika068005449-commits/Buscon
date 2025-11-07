@@ -8,12 +8,33 @@ export interface PickupPoint {
   coordinates: [number, number]; // [latitude, longitude]
 }
 
+export interface Trajet {
+  id: string;
+  origin: string;
+  destination: string;
+  departureTime: string;
+  status: 'Programmé' | 'En cours' | 'Terminé' | 'Annulé';
+  points: string[]; // array of pickup point IDs
+}
+
+export interface Bus {
+  id: string;
+  immatriculation: string;
+  modele: string;
+  capacite: number;
+  kilometrage: number;
+  derniereRevision: string; // date string
+  statut: 'En service' | 'En panne' | 'En maintenance' | 'Au dépôt';
+}
+
 export interface Trip {
   agency: string;
   origin: string;
   destination: string;
   finalDepartureTime: string;
   points: PickupPoint[];
+  trajets: Trajet[];
+  buses: Bus[];
 }
 
 export type SeatStatus = 'available' | 'occupied' | 'selected' | 'driver';

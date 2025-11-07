@@ -5,7 +5,7 @@ import SeatSelection from './components/SeatSelection';
 import Payment from './components/Payment';
 import Ticket from './components/Ticket';
 import AgencyDashboard from './components/agency/AgencyDashboard';
-import { Trip, PickupPoint, SeatData, PassengerInfo } from './types';
+import { Trip, PickupPoint, SeatData, PassengerInfo, Trajet, Bus } from './types';
 import { useTheme } from './hooks/useTheme';
 
 const mockTrip: Trip = {
@@ -19,6 +19,16 @@ const mockTrip: Trip = {
     { id: 'p1', nom: 'Mfilou', horaire_passage: '13:15', places_dispo: 3, coordinates: [-4.30, 15.23], adresse: 'Près de la Mairie', contact: '+242 06 123 4569' },
     { id: 'p4', nom: 'Arrêt Marché', horaire_passage: '13:45', places_dispo: 0, coordinates: [-4.26, 15.27], adresse: 'Devant le grand marché', contact: '+242 06 123 4570' },
   ],
+  trajets: [
+      { id: 't1', origin: 'Brazzaville', destination: 'Pointe-Noire', departureTime: '08:00', status: 'Programmé', points: ['p1', 'p2'] },
+      { id: 't2', origin: 'Brazzaville', destination: 'Dolisie', departureTime: '13:00', status: 'En cours', points: ['p1', 'p2', 'p3'] },
+      { id: 't3', origin: 'Pointe-Noire', destination: 'Brazzaville', departureTime: '20:00', status: 'Terminé', points: [] },
+  ],
+  buses: [
+      { id: 'b1', immatriculation: '1234 AB 5', modele: 'Toyota Coaster', capacite: 30, kilometrage: 150000, derniereRevision: '2025-10-15', statut: 'En service' },
+      { id: 'b2', immatriculation: '5678 CD 6', modele: 'Mercedes Sprinter', capacite: 22, kilometrage: 85000, derniereRevision: '2025-09-01', statut: 'En maintenance' },
+      { id: 'b3', immatriculation: '9101 EF 7', modele: 'Toyota Hiace', capacite: 18, kilometrage: 210000, derniereRevision: '2025-08-20', statut: 'En panne' },
+  ]
 };
 
 type AppStep = 'home' | 'pickup' | 'seats' | 'payment' | 'ticket' | 'agencyDashboard';
@@ -70,6 +80,10 @@ function App() {
     setSelectedSeats([]);
     setTotalPrice(0);
     setPassengerInfo(null);
+  };
+  
+  const handleBackToHome = () => {
+    setStep('home');
   };
 
   const renderStep = () => {
@@ -146,8 +160,10 @@ function App() {
       case 'agencyDashboard':
         return (
           <AgencyDashboard 
-            points={mockTrip.points} 
-            onBackToHome={handleNewBooking} 
+            initialPoints={mockTrip.points}
+            initialTrips={mockTrip.trajets}
+            initialBuses={mockTrip.buses}
+            onBackToHome={handleBackToHome} 
             theme={theme}
             toggleTheme={toggleTheme}
           />
