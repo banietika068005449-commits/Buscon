@@ -62,17 +62,18 @@ try {
     readFileSync(join(projectRoot, 'package.json'), 'utf8')
   );
   const hasRollup = packageJson.devDependencies?.rollup || packageJson.dependencies?.rollup;
+  const hasRollupLinux = packageJson.devDependencies?.['@rollup/rollup-linux-x64-gnu'];
   
-  if (!hasRollup) {
-    console.log('   ⚠️  Rollup non trouvé, ajout en cours...');
+  if (!hasRollup || !hasRollupLinux) {
+    console.log('   ⚠️  Rollup ou dépendance Linux manquante, ajout en cours...');
     if (packageManager === 'yarn') {
-      execSync('yarn add -D rollup @rollup/plugin-node-resolve @rollup/plugin-commonjs', 
+      execSync('yarn add -D rollup @rollup/plugin-node-resolve @rollup/plugin-commonjs @rollup/rollup-linux-x64-gnu', 
         { stdio: 'inherit', cwd: projectRoot });
     } else {
-      execSync('npm install -D rollup @rollup/plugin-node-resolve @rollup/plugin-commonjs', 
+      execSync('npm install -D rollup @rollup/plugin-node-resolve @rollup/plugin-commonjs @rollup/rollup-linux-x64-gnu', 
         { stdio: 'inherit', cwd: projectRoot });
     }
-    console.log('   ✓ Rollup ajouté');
+    console.log('   ✓ Rollup et dépendance Linux ajoutés');
   } else {
     console.log('   ✓ Rollup déjà présent');
   }
