@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import HomePage from './components/landing/HomePage';
 import PickupPointSelector from './components/PickupPointSelector';
 import SeatSelection from './components/SeatSelection';
 import Payment from './components/Payment';
 import Ticket from './components/Ticket';
+import AgencyDashboard from './components/agency/AgencyDashboard';
 import { Trip, PickupPoint, SeatData, PassengerInfo } from './types';
 import { useTheme } from './hooks/useTheme';
 
@@ -19,15 +21,23 @@ const mockTrip: Trip = {
   ],
 };
 
-type AppStep = 'pickup' | 'seats' | 'payment' | 'ticket';
+type AppStep = 'home' | 'pickup' | 'seats' | 'payment' | 'ticket' | 'agencyDashboard';
 
 function App() {
   const [theme, toggleTheme] = useTheme();
-  const [step, setStep] = useState<AppStep>('pickup');
+  const [step, setStep] = useState<AppStep>('home');
   const [selectedPoint, setSelectedPoint] = useState<PickupPoint | null>(null);
   const [selectedSeats, setSelectedSeats] = useState<SeatData[]>([]);
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const [passengerInfo, setPassengerInfo] = useState<PassengerInfo | null>(null);
+
+  const handleStartBooking = () => {
+    setStep('pickup');
+  };
+  
+  const handleOpenDashboard = () => {
+    setStep('agencyDashboard');
+  };
 
   const handlePickupContinue = (point: PickupPoint) => {
     setSelectedPoint(point);
@@ -55,7 +65,7 @@ function App() {
   };
 
   const handleNewBooking = () => {
-    setStep('pickup');
+    setStep('home');
     setSelectedPoint(null);
     setSelectedSeats([]);
     setTotalPrice(0);
@@ -64,67 +74,93 @@ function App() {
 
   const renderStep = () => {
     switch (step) {
+      case 'home':
+        return (
+          <HomePage
+            theme={theme}
+            toggleTheme={toggleTheme}
+            onStartBooking={handleStartBooking}
+            onOpenDashboard={handleOpenDashboard}
+          />
+        );
       case 'pickup':
         return (
-          <PickupPointSelector 
-            trip={mockTrip} 
-            theme={theme} 
-            toggleTheme={toggleTheme}
-            onContinue={handlePickupContinue}
-          />
+          <div className="min-h-screen w-full flex items-center justify-center font-sans p-4">
+            <PickupPointSelector 
+              trip={mockTrip} 
+              theme={theme} 
+              toggleTheme={toggleTheme}
+              onContinue={handlePickupContinue}
+            />
+          </div>
         );
       case 'seats':
         if (selectedPoint) {
           return (
-            <SeatSelection
-              trip={mockTrip}
-              selectedPoint={selectedPoint}
-              onBack={handleBackToPickup}
-              onContinue={handleSeatContinue}
-              theme={theme}
-              toggleTheme={toggleTheme}
-            />
+             <div className="min-h-screen w-full flex items-center justify-center font-sans p-4">
+              <SeatSelection
+                trip={mockTrip}
+                selectedPoint={selectedPoint}
+                onBack={handleBackToPickup}
+                onContinue={handleSeatContinue}
+                theme={theme}
+                toggleTheme={toggleTheme}
+              />
+            </div>
           );
         }
         return null;
       case 'payment':
         if (selectedPoint) {
           return (
-            <Payment
-              trip={mockTrip}
-              selectedPoint={selectedPoint}
-              selectedSeats={selectedSeats}
-              totalPrice={totalPrice}
-              onBack={handleBackToSeats}
-              onConfirm={handlePaymentConfirm}
-              theme={theme}
-              toggleTheme={toggleTheme}
-            />
+            <div className="min-h-screen w-full flex items-center justify-center font-sans p-4">
+              <Payment
+                trip={mockTrip}
+                selectedPoint={selectedPoint}
+                selectedSeats={selectedSeats}
+                totalPrice={totalPrice}
+                onBack={handleBackToSeats}
+                onConfirm={handlePaymentConfirm}
+                theme={theme}
+                toggleTheme={toggleTheme}
+              />
+            </div>
           );
         }
         return null;
       case 'ticket':
         if (selectedPoint && passengerInfo) {
           return (
-            <Ticket
-              trip={mockTrip}
-              selectedPoint={selectedPoint}
-              selectedSeats={selectedSeats}
-              passengerInfo={passengerInfo}
-              onNewBooking={handleNewBooking}
-            />
+            <div className="min-h-screen w-full flex items-center justify-center font-sans p-4">
+              <Ticket
+                trip={mockTrip}
+                selectedPoint={selectedPoint}
+                selectedSeats={selectedSeats}
+                passengerInfo={passengerInfo}
+                onNewBooking={handleNewBooking}
+              />
+            </div>
           );
         }
         return null;
+      case 'agencyDashboard':
+        return (
+          <AgencyDashboard 
+            points={mockTrip.points} 
+            onBackToHome={handleNewBooking} 
+            theme={theme}
+            toggleTheme={toggleTheme}
+          />
+        );
       default:
-        return null;
+        return <HomePage theme={theme} toggleTheme={toggleTheme} onStartBooking={handleStartBooking} onOpenDashboard={handleOpenDashboard} />;
     }
   }
 
   return (
-    <main className="min-h-screen w-full flex items-center justify-center font-sans p-4">
+    <>
       {renderStep()}
-    </main>
+    </>
   );
 }
 
