@@ -12,7 +12,8 @@
     "preview": "vite preview",
     "fix:build": "node scripts/fix-build.js",
     "fix:build:yarn": "yarn cache clean --all && rimraf node_modules yarn.lock package-lock.json && yarn install && yarn add -D rollup @rollup/plugin-node-resolve @rollup/plugin-commonjs && yarn upgrade vite rollup && yarn build",
-    "fix:build:npm": "npm cache clean --force && rimraf node_modules yarn.lock package-lock.json && npm install && npm install -D rollup @rollup/plugin-node-resolve @rollup/plugin-commonjs && npm update vite rollup && npm run build"
+    "fix:build:npm": "npm cache clean --force && rimraf node_modules yarn.lock package-lock.json && npm install && npm install -D rollup @rollup/plugin-node-resolve @rollup/plugin-commonjs && npm update vite rollup && npm run build",
+    "update:lockfile": "yarn cache clean --all && rimraf node_modules && yarn install"
   },
   "dependencies": {
     "@tailwindcss/forms": "^0.5.10",
