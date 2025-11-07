@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import PickupPointSelector from './components/PickupPointSelector';
 import SeatSelection from './components/SeatSelection';
 import Payment from './components/Payment';
-import { Trip, PickupPoint, SeatData } from './types';
+import Ticket from './components/Ticket';
+import { Trip, PickupPoint, SeatData, PassengerInfo } from './types';
 import { useTheme } from './hooks/useTheme';
 
 const mockTrip: Trip = {
@@ -11,14 +12,14 @@ const mockTrip: Trip = {
   destination: 'Dolisie',
   finalDepartureTime: '14:00',
   points: [
-    { id: 'p2', nom: 'Makélékélé', horaire_passage: '13:30', places_dispo: 8, coordinates: [-4.28, 15.25] },
-    { id: 'p3', nom: 'Talangaï', horaire_passage: '14:00', places_dispo: 12, coordinates: [-4.23, 15.30] },
-    { id: 'p1', nom: 'Mfilou', horaire_passage: '13:15', places_dispo: 3, coordinates: [-4.30, 15.23] },
-    { id: 'p4', nom: 'Arrêt Marché', horaire_passage: '13:45', places_dispo: 0, coordinates: [-4.26, 15.27] },
+    { id: 'p2', nom: 'Makélékélé', horaire_passage: '13:30', places_dispo: 8, coordinates: [-4.28, 15.25], adresse: 'Face marché Total', contact: '+242 06 123 4567' },
+    { id: 'p3', nom: 'Talangaï', horaire_passage: '14:00', places_dispo: 12, coordinates: [-4.23, 15.30], adresse: 'Arrêt de bus TBC', contact: '+242 06 123 4568' },
+    { id: 'p1', nom: 'Mfilou', horaire_passage: '13:15', places_dispo: 3, coordinates: [-4.30, 15.23], adresse: 'Près de la Mairie', contact: '+242 06 123 4569' },
+    { id: 'p4', nom: 'Arrêt Marché', horaire_passage: '13:45', places_dispo: 0, coordinates: [-4.26, 15.27], adresse: 'Devant le grand marché', contact: '+242 06 123 4570' },
   ],
 };
 
-type AppStep = 'pickup' | 'seats' | 'payment';
+type AppStep = 'pickup' | 'seats' | 'payment' | 'ticket';
 
 function App() {
   const [theme, toggleTheme] = useTheme();
@@ -26,6 +27,7 @@ function App() {
   const [selectedPoint, setSelectedPoint] = useState<PickupPoint | null>(null);
   const [selectedSeats, setSelectedSeats] = useState<SeatData[]>([]);
   const [totalPrice, setTotalPrice] = useState<number>(0);
+  const [passengerInfo, setPassengerInfo] = useState<PassengerInfo | null>(null);
 
   const handlePickupContinue = (point: PickupPoint) => {
     setSelectedPoint(point);
@@ -47,37 +49,81 @@ function App() {
     setStep('seats');
   };
 
+  const handlePaymentConfirm = (info: PassengerInfo) => {
+    setPassengerInfo(info);
+    setStep('ticket');
+  };
+
+  const handleNewBooking = () => {
+    setStep('pickup');
+    setSelectedPoint(null);
+    setSelectedSeats([]);
+    setTotalPrice(0);
+    setPassengerInfo(null);
+  };
+
+  const renderStep = () => {
+    switch (step) {
+      case 'pickup':
+        return (
+          <PickupPointSelector 
+            trip={mockTrip} 
+            theme={theme} 
+            toggleTheme={toggleTheme}
+            onContinue={handlePickupContinue}
+          />
+        );
+      case 'seats':
+        if (selectedPoint) {
+          return (
+            <SeatSelection
+              trip={mockTrip}
+              selectedPoint={selectedPoint}
+              onBack={handleBackToPickup}
+              onContinue={handleSeatContinue}
+              theme={theme}
+              toggleTheme={toggleTheme}
+            />
+          );
+        }
+        return null;
+      case 'payment':
+        if (selectedPoint) {
+          return (
+            <Payment
+              trip={mockTrip}
+              selectedPoint={selectedPoint}
+              selectedSeats={selectedSeats}
+              totalPrice={totalPrice}
+              onBack={handleBackToSeats}
+              onConfirm={handlePaymentConfirm}
+              theme={theme}
+              toggleTheme={toggleTheme}
+            />
+          );
+        }
+        return null;
+      case 'ticket':
+        if (selectedPoint && passengerInfo) {
+          return (
+            <Ticket
+              trip={mockTrip}
+              selectedPoint={selectedPoint}
+              selectedSeats={selectedSeats}
+              passengerInfo={passengerInfo}
+              onNewBooking={handleNewBooking}
+            />
+          );
+        }
+        return null;
+      default:
+        return null;
+    }
+  }
+
   return (
     <main className="min-h-screen w-full flex items-center justify-center font-sans p-4">
-      {step === 'pickup' && (
-        <PickupPointSelector 
-          trip={mockTrip} 
-          theme={theme} 
-          toggleTheme={toggleTheme}
-          onContinue={handlePickupContinue}
-        />
-      )}
-      {step === 'seats' && selectedPoint && (
-        <SeatSelection
-          trip={mockTrip}
-          selectedPoint={selectedPoint}
-          onBack={handleBackToPickup}
-          onContinue={handleSeatContinue}
-          theme={theme}
-          toggleTheme={toggleTheme}
-        />
-      )}
-      {step === 'payment' && selectedPoint && (
-        <Payment
-          trip={mockTrip}
-          selectedPoint={selectedPoint}
-          selectedSeats={selectedSeats}
-          totalPrice={totalPrice}
-          onBack={handleBackToSeats}
-          theme={theme}
-          toggleTheme={toggleTheme}
-        />
-      )}
+      {renderStep()}
     </main>
   );
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Armchair, SteeringWheel } from 'lucide-react';
+import { Armchair, LifeBuoy } from 'lucide-react';
 import { SeatData } from '../types';
 
 interface SeatProps {
@@ -14,7 +14,7 @@ const Seat: React.FC<SeatProps> = ({ seat, onSelect }) => {
   if (status === 'driver') {
     return (
       <div className="w-10 h-10 flex items-center justify-center" title="Conducteur">
-        <SteeringWheel className="w-8 h-8 text-slate-500 dark:text-slate-400" />
+        <LifeBuoy className="w-8 h-8 text-slate-500 dark:text-slate-400" />
       </div>
     );
   }

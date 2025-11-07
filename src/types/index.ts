@@ -1,6 +1,8 @@
 export interface PickupPoint {
   id: string;
   nom: string;
+  adresse: string;
+  contact: string;
   horaire_passage: string;
   places_dispo: number;
   coordinates: [number, number]; // [latitude, longitude]

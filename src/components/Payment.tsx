@@ -10,11 +10,12 @@ interface PaymentProps {
   selectedSeats: SeatData[];
   totalPrice: number;
   onBack: () => void;
+  onConfirm: (passengerInfo: PassengerInfo) => void;
   theme: 'light' | 'dark';
   toggleTheme: () => void;
 }
 
-const Payment: React.FC<PaymentProps> = ({ trip, selectedPoint, selectedSeats, totalPrice, onBack, theme, toggleTheme }) => {
+const Payment: React.FC<PaymentProps> = ({ trip, selectedPoint, selectedSeats, totalPrice, onBack, onConfirm, theme, toggleTheme }) => {
   const [passengerInfo, setPassengerInfo] = useState<PassengerInfo>({ fullName: '', phoneNumber: '', email: '' });
   const [paymentMethod, setPaymentMethod] = useState<string>('');
 
@@ -30,6 +31,12 @@ const Payment: React.FC<PaymentProps> = ({ trip, selectedPoint, selectedSeats, t
     return passengerInfo.fullName.trim() !== '' && passengerInfo.phoneNumber.trim() !== '' && paymentMethod !== '';
   }, [passengerInfo, paymentMethod]);
   
+  const handlePayment = () => {
+    if (isFormValid) {
+      onConfirm(passengerInfo);
+    }
+  };
+
   return (
     <motion.div
       className="w-full max-w-4xl mx-auto"
@@ -125,7 +132,7 @@ const Payment: React.FC<PaymentProps> = ({ trip, selectedPoint, selectedSeats, t
             <hr className="my-6 border-slate-200 dark:border-slate-700" />
             <div className="space-y-2">
                 <div className="flex justify-between text-slate-600 dark:text-slate-300">
-                    <span>{selectedSeats.length} siège(s) × {totalPrice / selectedSeats.length} XAF</span>
+                    <span>{selectedSeats.length > 0 ? selectedSeats.length : 1} siège(s) × {(totalPrice / (selectedSeats.length > 0 ? selectedSeats.length : 1)).toLocaleString('fr-FR')} XAF</span>
                     <span>{totalPrice.toLocaleString('fr-FR')} XAF</span>
                 </div>
                 <div className="flex justify-between text-slate-600 dark:text-slate-300">
@@ -143,6 +150,7 @@ const Payment: React.FC<PaymentProps> = ({ trip, selectedPoint, selectedSeats, t
         {/* Footer */}
         <div className="p-6 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 flex justify-end transition-colors duration-300">
           <button
+            onClick={handlePayment}
             disabled={!isFormValid}
             className="w-full sm:w-auto px-8 py-3 bg-sky-600 text-white font-semibold rounded-lg shadow-md hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 disabled:bg-slate-400 dark:disabled:bg-slate-600 disabled:cursor-not-allowed disabled:shadow-none transition-all duration-200"
           >
