@@ -6,9 +6,10 @@ import { motion } from 'framer-motion';
 interface HeaderProps {
   theme: 'light' | 'dark';
   toggleTheme: () => void;
+  onOpenDashboard: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ theme, toggleTheme }) => {
+const Header: React.FC<HeaderProps> = ({ theme, toggleTheme, onOpenDashboard }) => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   const navItems = ["Trajets", "Agences", "Aide"];
@@ -42,11 +43,11 @@ const Header: React.FC<HeaderProps> = ({ theme, toggleTheme }) => {
             transition={{ duration: 0.5 }}
           >
             <ThemeToggleButton theme={theme} toggleTheme={toggleTheme} />
-            <button className="text-slate-600 dark:text-slate-300 font-semibold hover:text-sky-500 dark:hover:text-sky-400 transition-colors">
-              Se connecter
-            </button>
-            <button className="bg-sky-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-sky-600 transition-all shadow-md">
-              S'inscrire
+            <button 
+              onClick={onOpenDashboard}
+              className="bg-sky-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-sky-600 transition-all shadow-md"
+            >
+              Espace Agence
             </button>
           </motion.div>
 
@@ -71,11 +72,14 @@ const Header: React.FC<HeaderProps> = ({ theme, toggleTheme }) => {
                 </a>
               ))}
               <hr className="border-slate-200 dark:border-slate-700"/>
-              <button className="text-slate-600 dark:text-slate-300 font-semibold text-left">
-                Se connecter
-              </button>
-              <button className="bg-sky-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-sky-600 transition-all">
-                S'inscrire
+              <button 
+                onClick={() => {
+                  onOpenDashboard();
+                  setIsMenuOpen(false);
+                }}
+                className="bg-sky-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-sky-600 transition-all w-full"
+              >
+                Espace Agence
               </button>
             </div>
           </motion.div>

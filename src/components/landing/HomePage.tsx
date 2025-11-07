@@ -14,7 +14,7 @@ interface HomePageProps {
 const HomePage: React.FC<HomePageProps> = ({ theme, toggleTheme, onStartBooking, onOpenDashboard }) => {
   return (
     <div className="bg-white dark:bg-slate-900">
-      <Header theme={theme} toggleTheme={toggleTheme} />
+      <Header theme={theme} toggleTheme={toggleTheme} onOpenDashboard={onOpenDashboard} />
       <main>
         <Hero onStartBooking={onStartBooking} />
         <Features />
