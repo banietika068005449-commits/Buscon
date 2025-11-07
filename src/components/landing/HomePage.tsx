@@ -9,9 +9,10 @@ interface HomePageProps {
   toggleTheme: () => void;
   onStartBooking: () => void;
   onOpenDashboard: () => void;
+  onOpenAdminDashboard: () => void;
 }
 
-const HomePage: React.FC<HomePageProps> = ({ theme, toggleTheme, onStartBooking, onOpenDashboard }) => {
+const HomePage: React.FC<HomePageProps> = ({ theme, toggleTheme, onStartBooking, onOpenDashboard, onOpenAdminDashboard }) => {
   return (
     <div className="bg-white dark:bg-slate-900">
       <Header theme={theme} toggleTheme={toggleTheme} onOpenDashboard={onOpenDashboard} />
@@ -19,7 +20,7 @@ const HomePage: React.FC<HomePageProps> = ({ theme, toggleTheme, onStartBooking,
         <Hero onStartBooking={onStartBooking} />
         <Features />
       </main>
-      <Footer onOpenDashboard={onOpenDashboard} />
+      <Footer onOpenDashboard={onOpenDashboard} onOpenAdminDashboard={onOpenAdminDashboard} />
     </div>
   );
 };

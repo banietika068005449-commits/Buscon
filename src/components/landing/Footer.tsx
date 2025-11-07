@@ -3,9 +3,10 @@ import { Bus, Facebook, Twitter, Instagram } from 'lucide-react';
 
 interface FooterProps {
   onOpenDashboard: () => void;
+  onOpenAdminDashboard: () => void;
 }
 
-const Footer: React.FC<FooterProps> = ({ onOpenDashboard }) => {
+const Footer: React.FC<FooterProps> = ({ onOpenDashboard, onOpenAdminDashboard }) => {
   return (
     <footer className="bg-slate-800 dark:bg-slate-900 text-slate-300">
       <div className="container mx-auto px-6 py-12">
@@ -29,6 +30,7 @@ const Footer: React.FC<FooterProps> = ({ onOpenDashboard }) => {
             <h4 className="font-semibold text-white mb-4">Partenaires</h4>
             <ul className="space-y-2">
               <li><button onClick={onOpenDashboard} className="hover:text-sky-400 transition-colors text-left w-full">Espace Agence</button></li>
+              <li><button onClick={onOpenAdminDashboard} className="hover:text-sky-400 transition-colors text-left w-full">Espace Admin</button></li>
               <li><a href="#" className="hover:text-sky-400 transition-colors">Devenir partenaire</a></li>
             </ul>
           </div>

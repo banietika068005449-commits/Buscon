@@ -5,7 +5,8 @@ import SeatSelection from './components/SeatSelection';
 import Payment from './components/Payment';
 import Ticket from './components/Ticket';
 import AgencyDashboard from './components/agency/AgencyDashboard';
-import { Trip, PickupPoint, SeatData, PassengerInfo, Trajet, Bus } from './types';
+import GlobalAdminDashboard from './components/admin/GlobalAdminDashboard';
+import { Trip, PickupPoint, SeatData, PassengerInfo, Trajet, Bus, Agence } from './types';
 import { useTheme } from './hooks/useTheme';
 
 const mockTrip: Trip = {
@@ -25,13 +26,19 @@ const mockTrip: Trip = {
       { id: 't3', origin: 'Pointe-Noire', destination: 'Brazzaville', departureTime: '20:00', status: 'Terminé', points: [] },
   ],
   buses: [
-      { id: 'b1', immatriculation: '1234 AB 5', modele: 'Toyota Coaster', capacite: 30, kilometrage: 150000, derniereRevision: '2025-10-15', statut: 'En service' },
-      { id: 'b2', immatriculation: '5678 CD 6', modele: 'Mercedes Sprinter', capacite: 22, kilometrage: 85000, derniereRevision: '2025-09-01', statut: 'En maintenance' },
-      { id: 'b3', immatriculation: '9101 EF 7', modele: 'Toyota Hiace', capacite: 18, kilometrage: 210000, derniereRevision: '2025-08-20', statut: 'En panne' },
+      { id: 'b1', immatriculation: '1234 AB 5', modele: 'Toyota Coaster', capacite: 30, kilometrage: 150000, derniereRevision: '2025-10-15', statut: 'En service', coordinates: [-4.26, 15.28] },
+      { id: 'b2', immatriculation: '5678 CD 6', modele: 'Mercedes Sprinter', capacite: 22, kilometrage: 85000, derniereRevision: '2025-09-01', statut: 'En maintenance', coordinates: [-4.78, 11.86] },
+      { id: 'b3', immatriculation: '9101 EF 7', modele: 'Toyota Hiace', capacite: 18, kilometrage: 210000, derniereRevision: '2025-08-20', statut: 'En panne', coordinates: [-4.20, 12.67] },
+      { id: 'b4', immatriculation: '2424 GH 8', modele: 'Hyundai County', capacite: 28, kilometrage: 12000, derniereRevision: '2025-11-01', statut: 'Au dépôt', coordinates: [-4.25, 15.26] },
+  ],
+  agences: [
+    { id: 'ag1', nom: 'TransCongo', ville: 'Brazzaville', adresse: '123 Av. de la République', telephone: '+242 05 555 0101', email: 'contact@transcongo.cg', responsable: { nom: 'Jean Dupont', email: 'j.dupont@transcongo.cg', telephone: '+242 06 111 2233' }, statut: 'Actif', date_creation: '2022-01-15', busActifs: 45, totalBus: 50, disponibilite: 90 },
+    { id: 'ag2', nom: 'Ocean du Nord', ville: 'Pointe-Noire', adresse: '456 Bd. de la Liberté', telephone: '+242 05 555 0202', email: 'contact@oceandunord.cg', responsable: { nom: 'Marie Dubois', email: 'm.dubois@oceandunord.cg', telephone: '+242 06 444 5566' }, statut: 'Actif', date_creation: '2021-03-20', busActifs: 28, totalBus: 35, disponibilite: 80 },
+    { id: 'ag3', nom: 'Voyages Express', ville: 'Dolisie', adresse: '789 Rue de la Paix', telephone: '+242 05 555 0303', email: 'contact@voyagesexpress.cg', responsable: { nom: 'Paul Martin', email: 'p.martin@voyagesexpress.cg', telephone: '+242 06 777 8899' }, statut: 'Inactif', date_creation: '2023-05-10', busActifs: 10, totalBus: 20, disponibilite: 50 },
   ]
 };
 
-type AppStep = 'home' | 'pickup' | 'seats' | 'payment' | 'ticket' | 'agencyDashboard';
+type AppStep = 'home' | 'pickup' | 'seats' | 'payment' | 'ticket' | 'agencyDashboard' | 'adminDashboard';
 
 function App() {
   const [theme, toggleTheme] = useTheme();
@@ -47,6 +54,10 @@ function App() {
   
   const handleOpenDashboard = () => {
     setStep('agencyDashboard');
+  };
+  
+  const handleOpenAdminDashboard = () => {
+    setStep('adminDashboard');
   };
 
   const handlePickupContinue = (point: PickupPoint) => {
@@ -95,6 +106,7 @@ function App() {
             toggleTheme={toggleTheme}
             onStartBooking={handleStartBooking}
             onOpenDashboard={handleOpenDashboard}
+            onOpenAdminDashboard={handleOpenAdminDashboard}
           />
         );
       case 'pickup':
@@ -168,8 +180,17 @@ function App() {
             toggleTheme={toggleTheme}
           />
         );
+      case 'adminDashboard':
+        return (
+          <GlobalAdminDashboard
+            initialAgences={mockTrip.agences}
+            onBackToHome={handleBackToHome}
+            theme={theme}
+            toggleTheme={toggleTheme}
+          />
+        );
       default:
-        return <HomePage theme={theme} toggleTheme={toggleTheme} onStartBooking={handleStartBooking} onOpenDashboard={handleOpenDashboard} />;
+        return <HomePage theme={theme} toggleTheme={toggleTheme} onStartBooking={handleStartBooking} onOpenDashboard={handleOpenDashboard} onOpenAdminDashboard={handleOpenAdminDashboard} />;
     }
   }
 
