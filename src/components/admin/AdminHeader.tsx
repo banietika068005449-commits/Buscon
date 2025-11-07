@@ -1,13 +1,25 @@
-import React from 'react';
-import { Search, Bell, UserCog } from 'lucide-react';
+import React, { useState } from 'react';
+import { Search, Bell, UserCog, LogOut, ChevronDown } from 'lucide-react';
 import ThemeToggleButton from '../ThemeToggleButton';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface AdminHeaderProps {
   theme: 'light' | 'dark';
   toggleTheme: () => void;
+  onLogout?: () => void;
 }
 
-const AdminHeader: React.FC<AdminHeaderProps> = ({ theme, toggleTheme }) => {
+const AdminHeader: React.FC<AdminHeaderProps> = ({ theme, toggleTheme, onLogout }) => {
+  const { user, logout } = useAuth();
+  const [showUserMenu, setShowUserMenu] = useState(false);
+
+  const handleLogout = () => {
+    logout();
+    if (onLogout) {
+      onLogout();
+    }
+  };
+
   return (
     <header className="h-16 bg-white dark:bg-slate-800 flex items-center justify-between px-6 border-b border-slate-200 dark:border-slate-700 flex-shrink-0">
       <div className="relative">
@@ -23,12 +35,30 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ theme, toggleTheme }) => {
         <button className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700">
           <Bell size={20} />
         </button>
-        <div className="flex items-center gap-2">
+        <div className="relative">
+          <button
+            onClick={() => setShowUserMenu(!showUserMenu)}
+            className="flex items-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg px-3 py-2 transition"
+          >
             <UserCog size={28} className="text-red-500"/>
-            <div>
-                <p className="text-sm font-semibold">Admin Global</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Supervision</p>
+            <div className="text-left">
+              <p className="text-sm font-semibold">{user?.nom || 'Admin Global'}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Supervision</p>
             </div>
+            <ChevronDown size={16} className="text-slate-400" />
+          </button>
+          
+          {showUserMenu && (
+            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 z-50">
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition"
+              >
+                <LogOut size={16} />
+                <span>Déconnexion</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>

@@ -74,3 +74,26 @@ export interface PassengerInfo {
   phoneNumber: string;
   email?: string;
 }
+
+// Types d'authentification
+export type UserRole = 'admin' | 'agence' | 'chauffeur';
+
+export interface User {
+  id: number;
+  email: string;
+  nom: string;
+  role: UserRole;
+  agence_id?: number;
+  agence_nom?: string;
+}
+
+export interface AuthResponse {
+  token: string;
+  user: User;
+  expires_in: number;
+}
+
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}

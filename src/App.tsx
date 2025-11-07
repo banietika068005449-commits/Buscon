@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import HomePage from './components/landing/HomePage';
 import PickupPointSelector from './components/PickupPointSelector';
 import SeatSelection from './components/SeatSelection';
@@ -6,6 +6,9 @@ import Payment from './components/Payment';
 import Ticket from './components/Ticket';
 import AgencyDashboard from './components/agency/AgencyDashboard';
 import GlobalAdminDashboard from './components/admin/GlobalAdminDashboard';
+import Login from './components/auth/Login';
+import ProtectedRoute from './components/auth/ProtectedRoute';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { Trip, PickupPoint, SeatData, PassengerInfo, Trajet, Bus, Agence } from './types';
 import { useTheme } from './hooks/useTheme';
 
@@ -38,9 +41,11 @@ const mockTrip: Trip = {
   ]
 };
 
-type AppStep = 'home' | 'pickup' | 'seats' | 'payment' | 'ticket' | 'agencyDashboard' | 'adminDashboard';
+type AppStep = 'home' | 'pickup' | 'seats' | 'payment' | 'ticket' | 'login' | 'agencyDashboard' | 'adminDashboard';
 
-function App() {
+// Composant interne qui utilise l'authentification
+const AppContent: React.FC = () => {
+  const { isAuthenticated, user, loading } = useAuth();
   const [theme, toggleTheme] = useTheme();
   const [step, setStep] = useState<AppStep>('home');
   const [selectedPoint, setSelectedPoint] = useState<PickupPoint | null>(null);
@@ -48,16 +53,42 @@ function App() {
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const [passengerInfo, setPassengerInfo] = useState<PassengerInfo | null>(null);
 
+  // Redirection automatique après connexion selon le rôle
+  useEffect(() => {
+    if (!loading && isAuthenticated && user) {
+      if (user.role === 'admin') {
+        setStep('adminDashboard');
+      } else if (user.role === 'agence') {
+        setStep('agencyDashboard');
+      }
+    } else if (!loading && !isAuthenticated && (step === 'agencyDashboard' || step === 'adminDashboard')) {
+      // Si déconnecté et sur un dashboard, rediriger vers login
+      setStep('login');
+    }
+  }, [isAuthenticated, user, loading, step]);
+
   const handleStartBooking = () => {
     setStep('pickup');
   };
   
   const handleOpenDashboard = () => {
-    setStep('agencyDashboard');
+    if (isAuthenticated && user?.role === 'agence') {
+      setStep('agencyDashboard');
+    } else {
+      setStep('login');
+    }
   };
   
   const handleOpenAdminDashboard = () => {
-    setStep('adminDashboard');
+    if (isAuthenticated && user?.role === 'admin') {
+      setStep('adminDashboard');
+    } else {
+      setStep('login');
+    }
+  };
+
+  const handleLoginSuccess = () => {
+    // La redirection sera gérée par useEffect
   };
 
   const handlePickupContinue = (point: PickupPoint) => {
@@ -97,8 +128,16 @@ function App() {
     setStep('home');
   };
 
+  const handleLogout = () => {
+    setStep('home');
+  };
+
   const renderStep = () => {
     switch (step) {
+      case 'login':
+        return (
+          <Login onLoginSuccess={handleLoginSuccess} />
+        );
       case 'home':
         return (
           <HomePage
@@ -171,23 +210,27 @@ function App() {
         return null;
       case 'agencyDashboard':
         return (
-          <AgencyDashboard 
-            initialPoints={mockTrip.points}
-            initialTrips={mockTrip.trajets}
-            initialBuses={mockTrip.buses}
-            onBackToHome={handleBackToHome} 
-            theme={theme}
-            toggleTheme={toggleTheme}
-          />
+          <ProtectedRoute requiredRole="agence">
+            <AgencyDashboard 
+              initialPoints={mockTrip.points}
+              initialTrips={mockTrip.trajets}
+              initialBuses={mockTrip.buses}
+              onBackToHome={handleBackToHome} 
+              theme={theme}
+              toggleTheme={toggleTheme}
+            />
+          </ProtectedRoute>
         );
       case 'adminDashboard':
         return (
-          <GlobalAdminDashboard
-            initialAgences={mockTrip.agences}
-            onBackToHome={handleBackToHome}
-            theme={theme}
-            toggleTheme={toggleTheme}
-          />
+          <ProtectedRoute requiredRole="admin">
+            <GlobalAdminDashboard
+              initialAgences={mockTrip.agences}
+              onBackToHome={handleBackToHome}
+              theme={theme}
+              toggleTheme={toggleTheme}
+            />
+          </ProtectedRoute>
         );
       default:
         return <HomePage theme={theme} toggleTheme={toggleTheme} onStartBooking={handleStartBooking} onOpenDashboard={handleOpenDashboard} onOpenAdminDashboard={handleOpenAdminDashboard} />;
@@ -198,6 +241,15 @@ function App() {
     <>
       {renderStep()}
     </>
+  );
+};
+
+// Composant principal avec AuthProvider
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 

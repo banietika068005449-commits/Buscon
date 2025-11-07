@@ -27,6 +27,10 @@ const AgencyDashboard: React.FC<AgencyDashboardProps> = ({ initialPoints, initia
   const [trips, setTrips] = useState<Trajet[]>(initialTrips);
   const [buses, setBuses] = useState<Bus[]>(initialBuses);
 
+  const handleLogout = () => {
+    onBackToHome();
+  };
+
   const renderView = () => {
     switch (currentView) {
       case 'dashboard':
@@ -48,7 +52,7 @@ const AgencyDashboard: React.FC<AgencyDashboardProps> = ({ initialPoints, initia
     <div className="flex h-screen bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200 font-sans">
       <Sidebar onBackToHome={onBackToHome} currentView={currentView} setCurrentView={setCurrentView} />
       <div className="flex-1 flex flex-col overflow-hidden">
-        <DashboardHeader theme={theme} toggleTheme={toggleTheme} />
+        <DashboardHeader theme={theme} toggleTheme={toggleTheme} onLogout={handleLogout} />
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-slate-100 dark:bg-slate-900 p-6">
           <AnimatePresence mode="wait">
             <motion.div
